@@ -101,8 +101,10 @@ module.exports = {
      */
     registerModel: function(connection, modelDefinition, name, mycro, cb) {
         try {
-            var model = Sequelize.import(name, modelDefinition);
-            return cb(null, model);
+            var model = connection.import(name, modelDefinition);
+            model.sync().then(function() {
+                return cb(null, model);
+            });
         } catch (err) {
             return cb('Error defining sequelize model (' + name + '): ' + err);
         }

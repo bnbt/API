@@ -1,6 +1,8 @@
 module.exports = {
     'findAll': function(req, res) {
-        res.send("All devices");
+        req.mycro.models['Devices'].findAll().then(function(result) {
+            res.send(result);
+        });
     },
     'findOne': function(req, res) {
         res.send("One Device");
