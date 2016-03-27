@@ -14,12 +14,13 @@ module.exports = function(mycro) {
                 }
             },
             '/devices': {
-                get: 'device/index.findAll'
+                get: 'device.findAll'
             },
             '/device': {
-                '/:id': {
-                    get: 'device/index.findOne'
-                }
+                options: {
+                    model: 'device'
+                },
+                routes: 'crud'
             }
         }
     };

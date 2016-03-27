@@ -1,11 +1,12 @@
 /* jshint indent: 2 */
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Audit', {
+  return sequelize.define('audit', {
     entity_id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
-      primaryKey: true
+      primaryKey: true,
+      autoIncrement: true
     },
     request_date: {
       type: DataTypes.DATE,
@@ -15,7 +16,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER(11),
       allowNull: true,
       references: {
-        model: 'Users',
+        model: 'user',
         key: 'entity_id'
       }
     },
@@ -23,7 +24,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER(11),
       allowNull: true,
       references: {
-        model: 'Devices',
+        model: 'device',
         key: 'entity_id'
       }
     },
@@ -31,12 +32,13 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER(11),
       allowNull: true,
       references: {
-        model: 'States',
+        model: 'state',
         key: 'entity_id'
       }
     }
   }, {
-    tableName: 'Audit',
+    timestamps: true,
+    tableName: 'audit',
     freezeTableName: true
   });
 };
