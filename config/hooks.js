@@ -6,6 +6,7 @@ module.exports = [
     'models',
     'services',
     'policies',
+    'mycro-util-policies',
     'controllers',
     'routes',
     'start'

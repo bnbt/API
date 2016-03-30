@@ -7,19 +7,41 @@ module.exports = function (mycro) {
             return Model
         };
     return {
-        create: function (req, res) { /* ... */
-        },
-        destroy: function (req, res) { /* ... */
-        },
-        find: function (req, res) {
-            var Model = populateModelFromRequest(req),
-                criteria = req.mycro.services['crud'].parseCriteriaFromRequest(req);
-            Model.find(criteria, function (err, results) {
-                if (err) return res.json(500, {error: err});
-                res.json(200, {data: results});
+        create: function (req, res) {
+            var model = populateModelFromRequest(req);
+            req.mycro.services['data'].create(model, req.body, function(err, records) {
+                if (err) {
+                    return res.json(500, {error: err});
+                }
+                res.json(200, records);
             });
         },
-        findOne: function (req, res) { /* ... */
+        destroy: function (req, res) {
+            var model = populateModelFromRequest(req);
+            req.mycro.services['data'].remove(model, req.params.id, function(err, records) {
+                if (err) {
+                    return res.json(500, {error: err});
+                }
+                res.json(200, records);
+            });
+        },
+        find: function (req, res) {
+            var model = populateModelFromRequest(req);
+            req.mycro.services['data'].find(model, req.query, function(err, records) {
+                if (err) {
+                    return res.json(500, {error: err});
+                }
+                res.json(200, records);
+            });
+        },
+        findOne: function (req, res) {
+            var model = populateModelFromRequest(req);
+            req.mycro.services['data'].detail(model, req.params.id, function(err, records) {
+                if (err) {
+                    return res.json(500, {error: err});
+                }
+                res.json(200, records);
+            });
         },
         update: function (req, res) { /* ... */
         }
