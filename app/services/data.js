@@ -5,40 +5,41 @@ module.exports = function(mycro) {
         create: function(model, values, cb) {
             model.create(values).then(function(data){
                 return cb(null, data);
+            }).catch(function(errors) {
+                return cb(errors, null);
             });
-            /**
-             * Details of instance here
-             */
         },
 
         detail: function(model, id, cb) {
             model.findOne({where: {entity_id: id}}).then(function(data){
                 return cb(null, data);
+            }).catch(function(errors) {
+                return cb(errors, null);
             });
-            /**
-             * Details of instance here
-             */
         },
 
         find: function(model, criteria, cb) {
             model.findAll({where: criteria}).then(function(data){
                 return cb(null, data);
+            }).catch(function(errors) {
+                return cb(errors, null);
             });
-            /**
-             * Find logic here
-             */
         },
 
         remove: function(model, id, cb) {
-            /**
-             * Delete logic here
-             */
+            model.destroy({where: {entity_id: id}}).then(function(data){
+                return cb(null, data);
+            }).catch(function(errors) {
+                return cb(errors, null);
+            });
         },
 
         update: function(model, id, values, cb) {
-            /**
-             * Update logic here
-             */
+            model.update(values, {entity_id: id}).then(function(count, data){
+                return cb(null, data);
+            }).catch(function(errors) {
+                return cb(errors, null);
+            });
         }
     };
 };
