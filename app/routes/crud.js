@@ -4,18 +4,14 @@ module.exports = function(mycro) {
         put: 'crud.create',
         '/:id': {
             policies: [
-                // THIS DOES NOT WORK!!! "query" container is empty. we need "params" container
-                mycro.policies.validate('query', function (joi) {
-                    return joi.object().keys({
+                // TODO: REMOVE HARDCODE FROM node_modules
+                mycro.policies.validate('params', function (joi) {
+                    return joi.object({
                         id: joi.number().required()
                     }).required();
                 }, {
-                    stripUnknown: true,
-                    convert: false,
-                    error: {
-                        status: 400,
-                        error: 'You fucked up'
-                    }
+                    stripUnknown: false,
+                    convert: true
                 })
             ],
             del: 'crud.destroy',

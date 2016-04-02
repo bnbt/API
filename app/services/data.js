@@ -18,6 +18,14 @@ module.exports = function(mycro) {
             });
         },
 
+        findWithCriteria: function(model, criteria, cb) {
+            model.findAll(criteria).then(function(data){
+                return cb(null, data);
+            }).catch(function(errors) {
+                return cb(errors, null);
+            });
+        },
+        
         find: function(model, criteria, cb) {
             model.findAll({where: criteria}).then(function(data){
                 return cb(null, data);

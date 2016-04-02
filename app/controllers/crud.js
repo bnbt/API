@@ -28,7 +28,6 @@ module.exports = function (mycro) {
             });
         },
         find: function (req, res) {
-            console.log(req);
             var model = populateModelFromRequest(req);
             req.mycro.services['data'].find(model, req.query, function(err, records) {
                 if (err) {
@@ -38,7 +37,6 @@ module.exports = function (mycro) {
             });
         },
         findOne: function (req, res) {
-            console.log(req);
             var model = populateModelFromRequest(req);
             req.mycro.services['data'].detail(model, req.params.id, function(err, records) {
                 if (err) {

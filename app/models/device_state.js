@@ -1,7 +1,7 @@
 /* jshint indent: 2 */
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('device_state', {
+  var device_state = sequelize.define('device_state', {
     entity_id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
@@ -25,8 +25,15 @@ module.exports = function(sequelize, DataTypes) {
       }
     }
   }, {
+    classMethods: {
+      associate: function (models) {
+        device_state.belongsToMany(models.state, {foreignKey: 'state_id'});
+        device_state.belongsToMany(models.device, {foreignKey: 'device_id'});
+      }
+    },
     timestamps: true,
     tableName: 'device_state',
     freezeTableName: true
   });
+  return device_state;
 };

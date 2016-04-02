@@ -1,7 +1,7 @@
 /* jshint indent: 2 */
 
 module.exports = function (sequelize, DataTypes) {
-  return sequelize.define('role', {
+  var role = sequelize.define('role', {
     entity_id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
@@ -22,4 +22,5 @@ module.exports = function (sequelize, DataTypes) {
     tableName: 'role',
     freezeTableName: true
   });
+  return role;
 };
