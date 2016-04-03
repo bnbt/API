@@ -6,7 +6,21 @@ module.exports = function (mycro) {
             options: {
                 model: 'device'
             },
-            routes: 'crud'
+            routes: 'crud',
+
+            '/state': {
+                policies: [
+                    mycro.services['validation'].deviceHeader(),
+                    mycro.services['validation'].deviceStateQuery()
+                ],
+                put: 'device.putState'
+            },
+            '/config': {
+                policies: [
+                    mycro.services['validation'].deviceHeader()
+                ],
+                get: 'device.getConfig'
+            }
         },
         '/user': {
             options: {
@@ -20,18 +34,11 @@ module.exports = function (mycro) {
             },
             routes: 'crud'
         },
-        '/config': {
-            policies: [
-                mycro.policies.validate('headers', function (joi) {
-                    return joi.object({
-                        device: joi.string().required()
-                    }).required();
-                }, {
-                    stripUnknown: true,
-                    convert: false
-                })
-            ],
-            get: 'config.get'
+        '/audit': {
+            options: {
+                model: 'audit'
+            },
+            get: 'crud.find'
         }
     };
 };

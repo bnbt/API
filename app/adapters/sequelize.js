@@ -102,23 +102,22 @@ module.exports = {
   registerModel: function (connection, modelDefinition, name, mycro, cb) {
     try {
       var model = connection.import(name, modelDefinition);
-      model.sync().then(function () {
-        return cb(null, model);
-      });
+      return cb(null, model);
     } catch (err) {
       return cb('Error defining sequelize model (' + name + '): ' + err);
     }
   },
 
-  //processModels: function (models, modelDefinitions, _fn) {
-  //  try {
-  //    asyncjs.each(models, function(model){
-  //      if(model.hasOwnProperty('associate')) {
-  //        model.associate(models);
-  //      }
-  //    });
-  //  } catch (err) {
-  //    return _fn(err);
-  //  }
-  //}
+  processModels: function (models, modelDefinitions, _fn) {
+    try {
+      Object.keys(models).forEach(function(modelName) {
+        if ("associate" in models[modelName]) {
+          models[modelName].associate(models);
+        }
+      });
+    } catch (err) {
+      return _fn(err);
+    }
+    return _fn();
+  }
 };

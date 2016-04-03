@@ -27,8 +27,8 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     classMethods: {
       associate: function (models) {
-        device_state.belongsToMany(models.state, {foreignKey: 'state_id'});
-        device_state.belongsToMany(models.device, {foreignKey: 'device_id'});
+        device_state.belongsTo(models.state, {foreignKey: 'state_id'});
+        device_state.belongsTo(models.device, {foreignKey: 'device_id'});
       }
     },
     timestamps: true,

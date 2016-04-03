@@ -9,7 +9,7 @@ module.exports = function (mycro) {
     return {
         create: function (req, res) {
             var model = populateModelFromRequest(req);
-            req.mycro.services['data'].create(model, JSON.parse(req.body), function(err, records) {
+            req.mycro.services['data'].create(model, req.body, function(err, records) {
                 if (err) {
                     return res.json(500, {error: err});
                 }

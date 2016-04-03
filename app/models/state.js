@@ -9,7 +9,7 @@ module.exports = function(sequelize, DataTypes) {
       autoIncrement: true
     },
     state_name: {
-      type: DataTypes.INTEGER(11),
+      type: DataTypes.STRING,
       allowNull: true
     },
     red: {
@@ -27,10 +27,11 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     classMethods: {
       associate: function (models) {
-        state.hasMany(models.device_state, {foreignKey: 'state_id'});
-        state.hasOne(models.device, {foreignKey: 'current_state'});
+        state.belongsToMany(models.device, {through: models.device_state, foreignKey: 'state_id', as: 'device_states'});
+        state.hasMany(models.device, {foreignKey: 'current_state'});
         state.hasMany(models.audit, {foreignKey: 'state_id'});
-      }
+      },
+      include: ['device']
     },
     timestamps: true,
     tableName: 'state',
