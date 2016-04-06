@@ -35,7 +35,7 @@ Given :
 
 The response should be formated as:
 ```
-~<current_state>,State 1,255,0,0,State 2,0,255,0,State 3,150,150,9~
+~<current_state>,<states_count>,State 1,255,0,0,State 2,0,255,0,State 3,150,150,9~
 ```
 # State
 ## Requiest
