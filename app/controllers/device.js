@@ -2,7 +2,13 @@
 var util = require('util');
 module.exports = function (mycro) {
     var socket = mycro.services['socket'],
-        data = mycro.services['data'];
+        data = mycro.services['data'],
+        populateModelFromRequest = function (req, res) {
+            var modelName = req.options.model,
+                Model = req.mycro.models[modelName];
+            if (!Model) return res.json(400, {error: 'Invalid model specified: ' + modelName});
+            return Model
+        };
     return {
         getConfig: function (req, res) {
             data.find(req.mycro.models['device'], {device_id: req.header('device')},
@@ -25,12 +31,39 @@ module.exports = function (mycro) {
                         stateColors[index] = [state.state_name, state.red, state.green, state.blue].join(',');
                     });
                     // return res.json(200, device);
-                    return res.end(util.format("~%d,%s~", currentState, stateColors.join(',')))
-                });
+                    return res.end(util.format("~%d,%d,%s~", currentState, stateColors.length, stateColors.join(',')))
+                }
+            );
         },
+
         putState: function (req, res) {
-            data.find(mycro.models['user']);
             res.json(200, [req.query, req.header('device')]);
+        },
+
+        getState: function (req, res) {
+
+        },
+
+        create: function (req, res) {
+            var model = populateModelFromRequest(req, res);
+            req.mycro.services['data'].create(model, req.body, function(err, records) {
+                if (err) {
+                    return res.json(500, {error: err});
+                }
+                res.json(200, records);
+                socket.emit('change', {type: req.options.model, records: records});
+            });
+        },
+
+        update: function (req, res) {
+            var model = populateModelFromRequest(req, res);
+            req.mycro.services['data'].updateDevice(model, req.params.id, req.body, function(err, records) {
+                if (err) {
+                    return res.json(500, {error: err});
+                }
+                res.json(200, records);
+                socket.emit('change', {type: req.options.model, records: records});
+            });
         }
     }
 };

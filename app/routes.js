@@ -3,17 +3,35 @@
 module.exports = function (mycro) {
     return {
         '/device': {
-            options: {
-                model: 'device'
+            get: 'crud.find',
+            put: 'device.create',
+            '/:id': {
+                // policies: [
+                //     // TODO: REMOVE HARDCODE FROM node_modules
+                //     mycro.policies.validate('params', function (joi) {
+                //         return joi.object({
+                //             id: joi.number().required()
+                //         }).required();
+                //     }, {
+                //         stripUnknown: false,
+                //         convert: true
+                //     })
+                // ],
+                del: 'crud.destroy',
+                get: 'crud.findOne',
+                post: 'device.update',
+                options: {
+                    model: 'device'
+                }
             },
-            routes: 'crud',
 
             '/state': {
                 policies: [
                     mycro.services['validation'].deviceHeader(),
                     mycro.services['validation'].deviceStateQuery()
                 ],
-                put: 'device.putState'
+                put: 'device.putState',
+                get: 'device.getState'
             },
             '/config': {
                 policies: [
@@ -26,7 +44,11 @@ module.exports = function (mycro) {
             options: {
                 model: 'user'
             },
-            routes: 'crud'
+            routes: 'crud',
+            
+            '/ad': {
+                get: 'user.getADUsers'
+            }
         },
         '/role': {
             options: {
@@ -39,6 +61,12 @@ module.exports = function (mycro) {
                 model: 'audit'
             },
             get: 'crud.find'
+        },
+        '/state': {
+            options: {
+                model: 'state'
+            },
+            routes: 'crud'
         }
     };
 };

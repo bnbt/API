@@ -30,8 +30,7 @@ module.exports = function(sequelize, DataTypes) {
         state.belongsToMany(models.device, {through: models.device_state, foreignKey: 'state_id', as: 'device_states'});
         state.hasMany(models.device, {foreignKey: 'current_state'});
         state.hasMany(models.audit, {foreignKey: 'state_id'});
-      },
-      include: ['device']
+      }
     },
     timestamps: true,
     tableName: 'state',

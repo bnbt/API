@@ -11,6 +11,10 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNull: true
         },
+        rfid: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
         role_id: {
             type: DataTypes.INTEGER(11),
             allowNull: true,
