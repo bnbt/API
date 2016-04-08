@@ -35,6 +35,10 @@ module.exports = function (sequelize, DataTypes) {
                 model: 'state',
                 key: 'entity_id'
             }
+        },
+        rfid: {
+            type: DataTypes.INTEGER(11),
+            allowNull: true
         }
     }, {
         classMethods: {

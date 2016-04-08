@@ -20,6 +20,17 @@ module.exports = function (mycro) {
                 stripUnknown: true,
                 convert: true
             })
+        },
+        entityId: function() {
+            // TODO: REMOVE HARDCODE FROM node_modules
+            return mycro.policies.validate('params', function (joi) {
+                return joi.object({
+                    id: joi.number().required()
+                }).required();
+            }, {
+                stripUnknown: false,
+                convert: true
+            })
         }
     }
 };

@@ -24,9 +24,9 @@ module.exports = function (sequelize, DataTypes) {
                 key: 'entity_id'
             }
         },
-        order: {
+        sort_order: {
             type: DataTypes.INTEGER(1),
-            allowNull: true,
+            allowNull: true
         }
     }, {
         classMethods: {

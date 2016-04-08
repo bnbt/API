@@ -4,15 +4,7 @@ module.exports = function(mycro) {
         put: 'crud.create',
         '/:id': {
             policies: [
-                // TODO: REMOVE HARDCODE FROM node_modules
-                mycro.policies.validate('params', function (joi) {
-                    return joi.object({
-                        id: joi.number().required()
-                    }).required();
-                }, {
-                    stripUnknown: false,
-                    convert: true
-                })
+                mycro.services['validation'].entityId()
             ],
             del: 'crud.destroy',
             get: 'crud.findOne',

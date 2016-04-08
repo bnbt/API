@@ -3,6 +3,7 @@ var util = require('util');
 module.exports = function (mycro) {
     var socket = mycro.services['socket'],
         data = mycro.services['data'],
+        models = mycro.models,
         populateModelFromRequest = function (req, res) {
             var modelName = req.options.model,
                 Model = req.mycro.models[modelName];
@@ -15,7 +16,7 @@ module.exports = function (mycro) {
                 function (err, records) {
                     if (err) {
                         res.status(500);
-                        return res.end()
+                        return res.end();
                     }
                     if (records && !records.length) {
                         res.status(404);
@@ -24,20 +25,60 @@ module.exports = function (mycro) {
                     let device = records[0];
                     var currentState = null,
                         stateColors = [];
-                    device.device_states.forEach(function (state, index) {
+                    device.deviceStates.forEach(function (state, index) {
                         if (device.state.entity_id === state.entity_id) {
                             currentState = index;
                         }
                         stateColors[index] = [state.state_name, state.red, state.green, state.blue].join(',');
                     });
-                    // return res.json(200, device);
                     return res.end(util.format("~%d,%d,%s~", currentState, stateColors.length, stateColors.join(',')))
                 }
             );
         },
 
         putState: function (req, res) {
-            res.json(200, [req.query, req.header('device')]);
+            var deviceId = req.header('device'),
+                stateNumber = req.query.s,
+                rfidCode = req.query.u,
+                device = null,
+                user = null,
+                deviceState = null;
+            var promises = [
+                data.findPromise(models['device'], {where: {device_id: deviceId}}),
+                data.findPromise(models['user'], {where: {rfid: rfidCode}})
+            ];
+            Promise.all(promises)
+                .then(function (values) {
+                    device = values[0];
+                    user = values[1];
+                    if (!device) {
+                        res.status(500);
+                        return res.end();
+                    }
+                    deviceState = device.deviceStates[stateNumber];
+                    if (deviceState === undefined) {
+                        res.status(404);
+                        return res.end();
+                    }
+                    device.setCurrentState(deviceState.entity_id);
+                    var audit = new models['audit'];
+                    audit.setRequestDate(new Date());
+                    user && audit.setUser(user);
+                    audit.setDevice(device);
+                    audit.setState(deviceState);
+                    audit.setRfid(rfidCode);
+                    return Promise.all([
+                        audit.save(),
+                        device.save()
+                    ]);
+                })
+                .then(function () {
+                    res.status(200);
+                    res.end();
+                })
+                .catch(function (error) {
+                    return res.json(500, error);
+                });
         },
 
         getState: function (req, res) {
@@ -46,7 +87,7 @@ module.exports = function (mycro) {
 
         create: function (req, res) {
             var model = populateModelFromRequest(req, res);
-            req.mycro.services['data'].create(model, req.body, function(err, records) {
+            req.mycro.services['data'].createDevice(model, req.body, function (err, records) {
                 if (err) {
                     return res.json(500, {error: err});
                 }
@@ -57,7 +98,7 @@ module.exports = function (mycro) {
 
         update: function (req, res) {
             var model = populateModelFromRequest(req, res);
-            req.mycro.services['data'].updateDevice(model, req.params.id, req.body, function(err, records) {
+            req.mycro.services['data'].updateDevice(model, req.params.id, req.body, function (err, records) {
                 if (err) {
                     return res.json(500, {error: err});
                 }

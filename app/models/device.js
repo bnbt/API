@@ -50,16 +50,16 @@ module.exports = function (sequelize, DataTypes) {
                 device.belongsToMany(models.state, {
                     through: {model: models.device_state},
                     foreignKey: 'device_id',
-                    as: { singular: 'deviceState', plural: 'deviceStates' }
+                    as: {singular: 'deviceState', plural: 'deviceStates'}
                 });
                 device.belongsTo(models.state, {foreignKey: 'current_state'});
             },
             include: function () {
-                return [{model: 'state', alias: 'state'}, {model: 'state', alias: 'device_states'}]
+                return [{model: 'state', alias: 'state'}, {model: 'state', alias: 'deviceStates'}]
             },
             order: function (models) {
                 return '`device`.`entity_id` ASC, ' +
-                '`device_states.device_state`.`order` ASC';
+                    '`deviceStates.device_state`.`sort_order` ASC';
             }
         },
         timestamps: true,

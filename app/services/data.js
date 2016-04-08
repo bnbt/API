@@ -19,12 +19,39 @@ module.exports = function (mycro) {
             return includeArray;
         },
         getOrder = function (model) {
-            if (model.hasOwnProperty('include')) {
+            if (model.hasOwnProperty('order')) {
                 return model.order(mycro.models);
             }
             return [];
+        },
+
+        setStates = function (values, device, cb) {
+            mycro.models['state'].findAll({where: {entity_id: values.deviceStates}}).then(function (states) {
+                device.setDeviceStates([]).then(function () {
+                    let promises = [];
+                    states.forEach(function(state, index) {
+                        promises.push(device.addDeviceState(state, {sort_order: index}));
+                    });
+                    return Promise.all(promises);
+                }).then(function() {
+                    return cb(null, device);
+                }).catch(function (errors) {
+                    return cb(errors, null);
+                });
+            }).catch(function (errors) {
+                return cb(errors, null);
+            });
+        },
+        findPromise = function (model, criteria) {
+            return model.findAll({
+                where: criteria,
+                include: getIncludes(model),
+                order: getOrder(model) || []
+            })
         };
+
     return {
+        findPromise: findPromise,
         create: function (model, values, cb) {
             model.create(values).then(function (data) {
                 return cb(null, data);
@@ -41,31 +68,13 @@ module.exports = function (mycro) {
             });
         },
 
-        findWithCriteria: function (model, criteria, addIncludes, cb) {
-            console.log(model);
-            if (addIncludes) {
-                criteria.include = getIncludes(model);
-            }
-            console.log(criteria);
-            model.findAll(criteria).then(function (data) {
-                return cb(null, data);
-            }).catch(function (errors) {
-                return cb(errors, null);
-            });
-        },
-
         find: function (model, criteria, cb) {
-            model.findAll({
-                where: criteria,
-                include: getIncludes(model),
-                order: getOrder(model) || []
-            }).then(function (data) {
+            findPromise(model, criteria).then(function (data) {
                 return cb(null, data);
             }).catch(function (errors) {
                 return cb(errors, null);
             });
         },
-
         remove: function (model, id, cb) {
             model.destroy({where: {entity_id: id}}).then(function (data) {
                 return cb(null, data);
@@ -75,7 +84,7 @@ module.exports = function (mycro) {
         },
 
         update: function (model, id, values, cb) {
-            model.findById(id).then(function(data) {
+            model.findById(id).then(function (data) {
                 data.updateAttributes(values).then(function (count, data) {
                     return cb(null, data);
                 }).catch(function (errors) {
@@ -85,23 +94,23 @@ module.exports = function (mycro) {
                 return cb(errors, null);
             });
         },
+        createDevice: function (model, values, cb) {
+            model.create(values).then(function (data) {
+                if (values.hasOwnProperty('deviceStates') && util.isArray(values.deviceStates)) {
+                    return setStates(values, device, cb);
+                }
+                return cb(null, data);
+            }).catch(function (errors) {
+                return cb(errors, null);
+            });
+        },
         updateDevice: function (model, id, values, cb) {
-            model.findById(id).then(function(device) {
+            model.findById(id).then(function (device) {
                 device.updateAttributes(values).then(function (count, data) {
-                    if(values.hasOwnProperty('deviceStates') && util.isArray(values.deviceStates)) {
-                        mycro.models['state'].findAll({where: {entity_id: values.deviceStates}}).then(function(states) {
-                            device.setDeviceStates(states).then(function(){
-                                return cb(null, 'Success!');
-                            }).catch(function (errors) {
-                                return cb(errors, null);
-                            });
-                        }).catch(function (errors) {
-                            return cb(errors, null);
-                        });
+                    if (values.hasOwnProperty('deviceStates') && util.isArray(values.deviceStates)) {
+                        return setStates(values, device, cb);
                     }
-                    else {
-                        return cb(null, data);
-                    }
+                    return cb(null, data);
                 }).catch(function (errors) {
                     return cb(errors, null);
                 });

@@ -12,7 +12,7 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: true
         },
         rfid: {
-            type: DataTypes.STRING,
+            type: DataTypes.INTEGER(11),
             allowNull: true
         },
         role_id: {
@@ -35,11 +35,6 @@ module.exports = function (sequelize, DataTypes) {
             },
             include: function () {
                 return ['role'];
-            },
-            bind: function (user, models, values) {
-                models.role.findAll({where: {entity_id: values}}).on('success', function(roles){
-                    user.setRoles(roles);
-                })
             }
         },
         timestamps: true,

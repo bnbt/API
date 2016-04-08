@@ -5,39 +5,40 @@ module.exports = function (mycro) {
         '/device': {
             get: 'crud.find',
             put: 'device.create',
+            options: {
+                model: 'device'
+            },
+
+            '/state': {
+                policies: [
+                    mycro.services['validation'].deviceHeader()
+                ],
+                put: {
+                    additionalPolicies: [
+                        mycro.services['validation'].deviceStateQuery()
+                    ],
+                    handler: 'device.putState'
+                },
+                get: 'device.getState'
+            },
+
+            '/config': {
+                policies: [
+                    mycro.services['validation'].deviceHeader()
+                ],
+                get: 'device.getConfig'
+            },
+
             '/:id': {
-                // policies: [
-                //     // TODO: REMOVE HARDCODE FROM node_modules
-                //     mycro.policies.validate('params', function (joi) {
-                //         return joi.object({
-                //             id: joi.number().required()
-                //         }).required();
-                //     }, {
-                //         stripUnknown: false,
-                //         convert: true
-                //     })
-                // ],
+                policies: [
+                    //mycro.services['validation'].entityId()
+                ],
                 del: 'crud.destroy',
                 get: 'crud.findOne',
                 post: 'device.update',
                 options: {
                     model: 'device'
                 }
-            },
-
-            '/state': {
-                policies: [
-                    mycro.services['validation'].deviceHeader(),
-                    mycro.services['validation'].deviceStateQuery()
-                ],
-                put: 'device.putState',
-                get: 'device.getState'
-            },
-            '/config': {
-                policies: [
-                    mycro.services['validation'].deviceHeader()
-                ],
-                get: 'device.getConfig'
             }
         },
         '/user': {
@@ -45,7 +46,7 @@ module.exports = function (mycro) {
                 model: 'user'
             },
             routes: 'crud',
-            
+
             '/ad': {
                 get: 'user.getADUsers'
             }
