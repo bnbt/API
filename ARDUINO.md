@@ -83,7 +83,7 @@ Device: <device_id>
 ### requirements 
 !!! Strip all possible headers
 ### status code
-`202` if success
+`200` if success
 `404` if user not authorised
 ### content-type
 `x` or any `1 char` length except [`~`, `,`]
