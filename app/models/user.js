@@ -1,4 +1,3 @@
-/* jshint indent: 2 */
 module.exports = function (sequelize, DataTypes) {
     var user = sequelize.define('user', {
         entity_id: {

@@ -1,5 +1,3 @@
-/* jshint indent: 2 */
-
 module.exports = function (sequelize, DataTypes) {
     var audit = sequelize.define('audit', {
         entity_id: {

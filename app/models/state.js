@@ -1,5 +1,3 @@
-/* jshint indent: 2 */
-
 module.exports = function (sequelize, DataTypes) {
     var state = sequelize.define('state', {
         entity_id: {
@@ -32,8 +30,16 @@ module.exports = function (sequelize, DataTypes) {
                     foreignKey: 'state_id',
                     as: {singular: 'stateDevice', plural: 'stateDevices'}
                 });
+                state.belongsToMany(models.role, {
+                    through: {model: models.state_role},
+                    foreignKey: 'state_id',
+                    as: {singular: 'stateRole', plural: 'stateRoles'}
+                });
                 state.hasMany(models.device, {foreignKey: 'current_state'});
                 state.hasMany(models.audit, {foreignKey: 'state_id'});
+            },
+            include: function () {
+                return [{model: 'role', alias: 'stateRoles'}]
             }
         },
         timestamps: true,

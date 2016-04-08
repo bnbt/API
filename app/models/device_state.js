@@ -1,5 +1,3 @@
-/* jshint indent: 2 */
-
 module.exports = function (sequelize, DataTypes) {
     var device_state = sequelize.define('device_state', {
         entity_id: {

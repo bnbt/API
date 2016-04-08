@@ -18,6 +18,7 @@ module.exports = function (mycro) {
                 }).required();
             }, {
                 stripUnknown: true,
+                allowUnknown: true,
                 convert: true
             })
         },
@@ -28,8 +29,9 @@ module.exports = function (mycro) {
                     id: joi.number().required()
                 }).required();
             }, {
+                convert: true,
                 stripUnknown: false,
-                convert: true
+                allowUnknown: true
             })
         }
     }

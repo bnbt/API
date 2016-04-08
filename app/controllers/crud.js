@@ -38,7 +38,7 @@ module.exports = function (mycro) {
         },
         findOne: function (req, res) {
             var model = populateModelFromRequest(req, res);
-            req.mycro.services['data'].detail(model, req.params.id, function(err, records) {
+            req.mycro.services['data'].detail(model, req.context.id, function(err, records) {
                 if (err) {
                     return res.json(500, {error: err});
                 }
@@ -47,7 +47,7 @@ module.exports = function (mycro) {
         },
         update: function (req, res) {
             var model = populateModelFromRequest(req, res);
-            req.mycro.services['data'].update(model, req.params.id, JSON.parse(req.body), function(err, records) {
+            req.mycro.services['data'].update(model, req.params.id, req.body, function(err, records) {
                 if (err) {
                     return res.json(500, {error: err});
                 }

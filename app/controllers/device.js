@@ -1,5 +1,6 @@
 'use strict';
-var util = require('util');
+var util = require('util'),
+    Promise = require('bluebird');
 module.exports = function (mycro) {
     var socket = mycro.services['socket'],
         data = mycro.services['data'],
@@ -44,14 +45,14 @@ module.exports = function (mycro) {
                 user = null,
                 deviceState = null;
             var promises = [
-                data.findPromise(models['device'], {where: {device_id: deviceId}}),
-                data.findPromise(models['user'], {where: {rfid: rfidCode}})
+                data.findOnePromise(models['device'], {device_id: deviceId}),
+                data.findOnePromise(models['user'], {rfid: rfidCode})
             ];
             Promise.all(promises)
                 .then(function (values) {
                     device = values[0];
                     user = values[1];
-                    if (!device) {
+                    if (device === undefined) {
                         res.status(500);
                         return res.end();
                     }
@@ -60,21 +61,24 @@ module.exports = function (mycro) {
                         res.status(404);
                         return res.end();
                     }
-                    device.setCurrentState(deviceState.entity_id);
-                    var audit = new models['audit'];
-                    audit.setRequestDate(new Date());
-                    user && audit.setUser(user);
-                    audit.setDevice(device);
-                    audit.setState(deviceState);
-                    audit.setRfid(rfidCode);
+                    device.set('current_state', deviceState.entity_id);
+                    let auditAttributes = {
+                        request_date: new Date(),
+                        device_id: device.entity_id,
+                        state_id: deviceState.entity_id,
+                        rfid: rfidCode,
+                        user: user || null
+                    };
                     return Promise.all([
-                        audit.save(),
+                        models['audit'].create(auditAttributes),
                         device.save()
                     ]);
                 })
                 .then(function () {
+                    socket.emit('change', {type: 'device', records: device});
+                    let response = user ? user.name : 'Unknown user';
                     res.status(200);
-                    res.end();
+                    res.end(util.format("~%s~", response));
                 })
                 .catch(function (error) {
                     return res.json(500, error);
@@ -82,7 +86,29 @@ module.exports = function (mycro) {
         },
 
         getState: function (req, res) {
+            data.findOne(req.mycro.models['device'], {device_id: req.header('device')},
+                function (err, device) {
+                    if (err) {
+                        res.status(500);
+                        return res.end();
+                    }
+                    if (!device) {
+                        res.status(404);
+                        return res.end();
+                    }
+                    if (!device.current_state) {
+                        res.status(404);
+                        return res.end();
+                    }
 
+                    device.deviceStates.some(function (state) {
+                        if(state.entity_id === device.state.entity_id) {
+                            res.status(200);
+                            return res.end(util.format("~%d~", state.device_state.sort_order))
+                        }
+                    });
+                }
+            );
         },
 
         create: function (req, res) {
