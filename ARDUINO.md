@@ -17,6 +17,7 @@ Device: <device_id>
 ### status code
 * `200` if succes
 * `404` if device not found
+
 ### content-type
 `x` or any `1 char` length except [`~`, `,`]
 
@@ -54,8 +55,10 @@ Device: <device_id>
 ### requirements 
 !!! Strip all possible headers
 ### status code
-`202` if success
-`403` if user not authorised
+* `200` if success
+* `403` if user not authorised
+* `404` if device not found
+
 ### content-type
 `x` or any `1 char` length except [`~`, `,`]
 
@@ -66,6 +69,10 @@ Device: <device_id>
 or
 ```
 ~403~
+```
+or
+```
+~404~
 ```
 
 # Get state
@@ -83,8 +90,9 @@ Device: <device_id>
 ### requirements 
 !!! Strip all possible headers
 ### status code
-`200` if success
-`404` if user not authorised
+* `200` if success
+* `404` if device not found 
+
 ### content-type
 `x` or any `1 char` length except [`~`, `,`]
 
