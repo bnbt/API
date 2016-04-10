@@ -14,7 +14,6 @@ module.exports = function (mycro) {
                     return res.json(500, {error: err});
                 }
                 res.json(200, records);
-                socket.emit('create', {type: req.options.model, records: records});
             });
         },
         destroy: function (req, res) {
@@ -24,7 +23,6 @@ module.exports = function (mycro) {
                     return res.json(500, {error: err});
                 }
                 res.json(200, records);
-                socket.emit('destroy', {type: req.options.model, records: records});
             });
         },
         find: function (req, res) {
@@ -52,7 +50,6 @@ module.exports = function (mycro) {
                     return res.json(500, {error: err});
                 }
                 res.json(200, records);
-                socket.emit('update', {type: req.options.model, records: records});
             });
         }
     }

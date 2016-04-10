@@ -37,6 +37,10 @@ module.exports = function (sequelize, DataTypes) {
         rfid: {
             type: DataTypes.INTEGER(11),
             allowNull: true
+        },
+        accepted: {
+            type: DataTypes.BOOLEAN,
+            allowNull: true
         }
     }, {
         classMethods: {

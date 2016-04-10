@@ -43,7 +43,8 @@ module.exports = function (mycro) {
                 rfidCode = req.query.u,
                 device = null,
                 user = null,
-                deviceState = null;
+                deviceState = null,
+                accepted = false;
             var promises = [
                 data.findOnePromise(models['device'], {device_id: deviceId}),
                 data.findOnePromise(models['user'], {rfid: rfidCode})
@@ -54,34 +55,66 @@ module.exports = function (mycro) {
                     user = values[1];
                     if (device === undefined) {
                         res.status(500);
-                        return res.end();
+                        res.end();
+                        return Promise.reject();
                     }
                     deviceState = device.deviceStates[stateNumber];
                     if (deviceState === undefined) {
                         res.status(404);
-                        return res.end();
+                        res.end();
+                        return Promise.reject();
                     }
+                    if (!user) {
+                        return Promise.resolve(null);
+                    }
+                    return deviceState.reload({include: data.getIncludes(models.state)});
+                })
+                .then(function (reloadedState) {
+                    if (!reloadedState) {
+                        return Promise.resolve();
+                    }
+                    deviceState = reloadedState;
+                    if (!deviceState.stateRoles.length) {
+                        return Promise.resolve();
+                    }
+                    var stateAllowedRole = false;
+                    deviceState.stateRoles.some(function(role) {
+                        if (role.entity_id === user.role.entity_id) {
+                            return stateAllowedRole = true;
+                        }
+                    });
+                    if (! stateAllowedRole) {
+                        res.status(403);
+                        res.end();
+                        return Promise.reject();
+                    }
+                    return Promise.resolve();
+                })
+                .then(function () {
                     device.set('current_state', deviceState.entity_id);
-                    let auditAttributes = {
-                        request_date: new Date(),
-                        device_id: device.entity_id,
-                        state_id: deviceState.entity_id,
-                        rfid: rfidCode,
-                        user: user || null
-                    };
-                    return Promise.all([
-                        models['audit'].create(auditAttributes),
-                        device.save()
-                    ]);
+                    return device.save();
                 })
                 .then(function () {
                     socket.emit('change', {type: 'device', records: device});
                     let response = user ? user.user_AD : 'Unknown user';
                     res.status(200);
                     res.end(util.format("~%s~", response));
+                    accepted = true;
+                    Promise.resolve();
                 })
                 .catch(function (error) {
                     return res.json(500, error);
+                })
+                .finally(function() {
+                    let auditAttributes = {
+                        request_date: new Date(),
+                        device_id: device.entity_id,
+                        state_id: deviceState.entity_id,
+                        rfid: rfidCode,
+                        user: user || null,
+                        accepted: accepted
+                    };
+                    return models['audit'].create(auditAttributes);
                 });
         },
 
@@ -102,7 +135,7 @@ module.exports = function (mycro) {
                     }
 
                     device.deviceStates.some(function (state) {
-                        if(state.entity_id === device.state.entity_id) {
+                        if (state.entity_id === device.state.entity_id) {
                             res.status(200);
                             return res.end(util.format("~%d~", state.device_state.sort_order))
                         }

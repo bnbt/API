@@ -55,18 +55,19 @@ module.exports = function (mycro) {
             return model.findAll({
                 where: criteria,
                 include: getIncludes(model),
-                order: getOrder(model) || []
+                order: getOrder(model)
             })
         },
         findOnePromise = function (model, criteria) {
             return model.find({
                 where: criteria,
                 include: getIncludes(model),
-                order: getOrder(model) || []
+                order: getOrder(model)
             })
         };
 
     return {
+        getIncludes: getIncludes,
         findPromise: findPromise,
         findOnePromise: findOnePromise,
         create: function (model, values, cb) {
