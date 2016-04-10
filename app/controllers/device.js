@@ -76,7 +76,7 @@ module.exports = function (mycro) {
                 })
                 .then(function () {
                     socket.emit('change', {type: 'device', records: device});
-                    let response = user ? user.name : 'Unknown user';
+                    let response = user ? user.user_AD : 'Unknown user';
                     res.status(200);
                     res.end(util.format("~%s~", response));
                 })

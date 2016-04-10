@@ -44,6 +44,13 @@ module.exports = function (mycro) {
                     return Promise.all(promises);
                 })
         },
+        setRoles = function (values, state) {
+            return models['role']
+                .findAll({where: {entity_id: values.stateRoles}})
+                .then(function (data) {
+                    return state.setStateRoles(data)
+                })
+        },
         findPromise = function (model, criteria) {
             return model.findAll({
                 where: criteria,
@@ -109,17 +116,57 @@ module.exports = function (mycro) {
                 return cb(errors, null);
             });
         },
+        createState: function (model, values, cb) {
+            var state = null;
+            model.create(values).then(function (data) {
+                state = data;
+                if (!values.hasOwnProperty('stateRoles')) {
+                    return Promise.resolve();
+                }
+                return setRoles(values, state);
+            }).then(function () {
+                return cb(null, state);
+            }).catch(function (errors) {
+                if (state) {
+                    state.destroy().then(function () {
+                        return cb(errors, null);
+                    })
+                }
+                return cb(errors, null);
+            });
+        },
+        updateState: function (model, id, values, cb) {
+            var state = null;
+            model.findById(id).then(function (data) {
+                state = data;
+                return state.updateAttributes(values);
+            }).then(function () {
+                if (!values.hasOwnProperty('stateRoles')) {
+                    return Promise.resolve();
+                }
+                return setRoles(values, state);
+            }).then(function () {
+                return cb(null, state);
+            }).catch(function (errors) {
+                return cb(errors, null);
+            });
+        },
         createDevice: function (model, values, cb) {
             var device = null;
             model.create(values).then(function (data) {
                 device = data;
                 if (!values.hasOwnProperty('deviceStates')) {
-                    values.deviceStates = [];
+                    return Promise.resolve();
                 }
-                return setStates(values, device, cb);
+                return setStates(values, device);
             }).then(function () {
                 return cb(null, device);
             }).catch(function (errors) {
+                if (device) {
+                    return device.destroy().then(function () {
+                        return cb(errors, null);
+                    })
+                }
                 return cb(errors, null);
             });
         },
@@ -130,8 +177,10 @@ module.exports = function (mycro) {
                     device = data;
                     return device.updateAttributes(values);
                 })
-                .then(function (data) {
-                    device = data;
+                .then(function () {
+                    if (!values.hasOwnProperty('deviceStates')) {
+                        return Promise.resolve();
+                    }
                     return setStates(values, device);
                 })
                 .then(function () {

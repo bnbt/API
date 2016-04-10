@@ -31,7 +31,7 @@ module.exports = function (mycro) {
 
             '/:id': {
                 policies: [
-                    //mycro.services['validation'].entityId()
+                    mycro.services['validation'].entityId()
                 ],
                 del: 'crud.destroy',
                 get: 'crud.findOne',
@@ -64,6 +64,19 @@ module.exports = function (mycro) {
             get: 'crud.find'
         },
         '/state': {
+            get: 'crud.find',
+            put: 'state.create',
+            '/:id': {
+                policies: [
+                    mycro.services['validation'].entityId()
+                ],
+                del: 'crud.destroy',
+                get: 'crud.findOne',
+                post: 'state.update',
+                options: {
+                    model: 'state'
+                }
+            },
             options: {
                 model: 'state'
             },
