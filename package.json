@@ -1,5 +1,5 @@
 {
-  "name": "BNB API",
+  "name": "bnb-api",
   "version": "1.0.0",
   "description": "API for the BNB",
   "main": "index.js",
@@ -10,9 +10,11 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "activedirectory": "^0.7.2",
     "mycro": "^0.4.0",
     "mycro-util-policies": "^0.2.0",
     "mysql": "^2.10.2",
+    "restify-cors-middleware": "0.0.6",
     "sequelize": "^3.20.0",
     "socket.io": "^1.4.5"
   },

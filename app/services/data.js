@@ -1,6 +1,7 @@
 'use strict';
 var util = require('util'),
-    Promise = require('bluebird');
+    Promise = require('bluebird'),
+    fs = require('fs');
 module.exports = function (mycro) {
     var models = mycro.models,
         getIncludes = function (model) {
@@ -190,6 +191,9 @@ module.exports = function (mycro) {
                 .catch(function (errors) {
                     return cb(errors, null);
                 });
+        },
+        validateUser: function(req, res) {
+            return true;
         }
     };
 };

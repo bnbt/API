@@ -81,6 +81,12 @@ module.exports = function (mycro) {
                 model: 'state'
             },
             routes: 'crud'
+        } ,
+        '/login': {
+            post: 'user.login'
+        } ,
+        '/logout': {
+            post: 'user.logout'
         }
     };
 };

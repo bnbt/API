@@ -14,6 +14,10 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.INTEGER(11),
             allowNull: true
         },
+        token: {
+            type: DataTypes.INTEGER(11),
+            allowNull: true
+        },
         role_id: {
             type: DataTypes.INTEGER(11),
             allowNull: true,
