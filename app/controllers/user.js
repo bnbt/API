@@ -62,13 +62,14 @@ module.exports = function (mycro) {
                         }
                     })
                     .then(function(data) {
-                        if(data instanceof models['user']) {
+                        if(data instanceof models['user'].Instance) {
                             user = data;
                         }
-                        res.json(200, {token: token, role: user.role !== undefined ? user.role.name : null});
+                        let role = user ? user.role ? user.role.name : null : null;
+                        res.json(200, {token: token, role: role });
                     })
                     .catch(function (err) {
-                        res.json(401, JSON.parse(err));
+                        res.json(401, err);
                     });
             });
         }

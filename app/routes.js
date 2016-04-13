@@ -1,5 +1,5 @@
 'use strict';
-
+const ADMIN = 'ADMIN';
 module.exports = function (mycro) {
     return {
         '/device': {
@@ -40,14 +40,14 @@ module.exports = function (mycro) {
                 ],
                 del: {
                     additionalPolicies: [
-                        mycro.policies['has_role']('ADMIN')
+                        mycro.policies['has_role'](ADMIN)
                     ],
                     handler: 'crud.destroy'
                 },
                 get: 'crud.findOne',
                 post: {
                     additionalPolicies: [
-                        mycro.policies['has_role']('ADMIN')
+                        mycro.policies['has_role'](ADMIN)
                     ],
                     handler: 'device.update'
                 },
@@ -58,7 +58,7 @@ module.exports = function (mycro) {
         },
         '/user': {
             policies: [
-                mycro.policies['has_role']('ADMIN')
+                mycro.policies['has_role'](ADMIN)
             ],
             options: {
                 model: 'user'
@@ -71,7 +71,7 @@ module.exports = function (mycro) {
         },
         '/role': {
             policies: [
-                mycro.policies['has_role']('ADMIN')
+                mycro.policies['has_role'](ADMIN)
             ],
             options: {
                 model: 'role'
@@ -94,7 +94,7 @@ module.exports = function (mycro) {
         },
         '/rfid': {
             policies: [
-                mycro.policies['has_role']('ADMIN')
+                mycro.policies['has_role'](ADMIN)
             ],
             options: {
                 model: 'audit'
@@ -103,7 +103,7 @@ module.exports = function (mycro) {
         },
         '/state': {
             policies: [
-                mycro.policies['has_role']('ADMIN')
+                mycro.policies['has_role'](ADMIN)
             ],
             get: 'crud.find',
             put: 'state.create',
