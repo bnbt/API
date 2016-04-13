@@ -11,6 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "activedirectory": "^0.7.2",
+    "atob": "^2.0.3",
     "js-yaml": "^3.5.5",
     "mycro": "^0.4.0",
     "mycro-util-policies": "^0.2.0",

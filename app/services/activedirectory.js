@@ -2,7 +2,13 @@ var ActiveDirectory = require('activedirectory'),
     fs = require('fs'),
     yaml = require('js-yaml'),
     params = yaml.safeLoad(fs.readFileSync('config/parameters.yml', 'utf8')),
-    ad = new ActiveDirectory(params['ad']);
+    atob = require('atob'),
+    ad = new ActiveDirectory({
+        host: params['ad']['host'],
+        username: params['ad']['username'],
+        password: atob(params['ad']['password']),
+        baseDN: params['ad']['baseDN']
+    });
 
 module.exports = function (mycro) {
     var findUser = function (user, callback) {
