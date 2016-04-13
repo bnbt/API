@@ -7,7 +7,7 @@ db:
   password:
   database: bnb
 ad:
-  host:
+  url:
   username:
   password:
   baseDN:

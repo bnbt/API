@@ -4,7 +4,7 @@ var ActiveDirectory = require('activedirectory'),
     params = yaml.safeLoad(fs.readFileSync('config/parameters.yml', 'utf8')),
     atob = require('atob'),
     ad = new ActiveDirectory({
-        host: params['ad']['host'],
+        url: params['ad']['url'],
         username: params['ad']['username'],
         password: atob(params['ad']['password']),
         baseDN: params['ad']['baseDN']

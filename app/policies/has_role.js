@@ -4,8 +4,7 @@ module.exports = function (roleName) {
         var models = req.mycro.models,
             token = req.headers['x-token'];
             if(token === undefined || !token) {
-                res.json(401, {error: 'Unauthorized'});
-                res.end();
+                return res.json(401, {error: 'Unauthorized'});
             }
         models['user'].findOne({
             where: {
@@ -17,14 +16,12 @@ module.exports = function (roleName) {
             }]
         }).then(function (user) {
             if (!user) {
-                res.json(403, {error: 'Forbidden'});
-                return res.end();
+                return res.json(403, {error: 'Forbidden'});
             }
             req.user = user;
             next();
         }).catch(function () {
-            res.json(500, {error: 'Problem authenticating'});
-            res.end();
+            return res.json(500, {error: 'Problem authenticating'});
         });
     }
 

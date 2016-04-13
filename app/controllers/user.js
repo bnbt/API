@@ -34,7 +34,7 @@ module.exports = function (mycro) {
                 res.json(400, {error: err});
             });
         },
-        
+
         login: function (req, res) {
             var username = req.body.username,
                 password = req.body.password;
@@ -47,16 +47,23 @@ module.exports = function (mycro) {
                 }
                 // authentication successful
                 var token = sha1(username + new Date().getTime()),
-                    models = mycro.models;
+                    models = mycro.models,
+                    user = null;
                 models['user'].findOne({
                         where: {user_AD: username},
                         include: [models['role']]
                     })
-                    .then(function (user) {
-                        if (user) {
+                    .then(function (data) {
+                        if (data) {
+                            user = data;
                             return user.update({token: token})
                         } else {
                             models['user'].create({user_AD: username, token: token});
+                        }
+                    })
+                    .then(function(data) {
+                        if(data instanceof models['user']) {
+                            user = data;
                         }
                         res.json(200, {token: token, role: user.role !== undefined ? user.role.name : null});
                     })
