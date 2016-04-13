@@ -33,6 +33,18 @@ module.exports = function (mycro) {
                 stripUnknown: false,
                 allowUnknown: true
             })
+        },
+        hasCredentials: function() {
+            return mycro.policies.validate('body', function (joi) {
+                return joi.object({
+                    username: joi.string().required(),
+                    password: joi.string().required()
+                }).required();
+            }, {
+                convert: true,
+                stripUnknown: true,
+                allowUnknown: false
+            })
         }
     }
 };

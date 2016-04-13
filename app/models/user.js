@@ -38,6 +38,11 @@ module.exports = function (sequelize, DataTypes) {
             },
             include: function () {
                 return ['role'];
+            },
+            order: function(model) {
+                return [
+                    ['entity_id', 'DESC']
+                ];
             }
         },
         timestamps: true,

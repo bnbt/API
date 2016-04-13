@@ -4,7 +4,12 @@ module.exports = function (mycro) {
     return {
         '/device': {
             get: 'crud.find',
-            put: 'device.create',
+            put: {
+                policies: [
+                    mycro.policies['has_role']('ADMIN')
+                ],
+                handler: 'device.create'
+            },
             options: {
                 model: 'device'
             },
@@ -31,17 +36,30 @@ module.exports = function (mycro) {
 
             '/:id': {
                 policies: [
-                    mycro.services['validation'].entityId()
+                    mycro.services['validation'].entityId(),
                 ],
-                del: 'crud.destroy',
+                del: {
+                    additionalPolicies: [
+                        mycro.policies['has_role']('ADMIN')
+                    ],
+                    handler: 'crud.destroy'
+                },
                 get: 'crud.findOne',
-                post: 'device.update',
+                post: {
+                    additionalPolicies: [
+                        mycro.policies['has_role']('ADMIN')
+                    ],
+                    handler: 'device.update'
+                },
                 options: {
                     model: 'device'
                 }
             }
         },
         '/user': {
+            policies: [
+                mycro.policies['has_role']('ADMIN')
+            ],
             options: {
                 model: 'user'
             },
@@ -52,6 +70,9 @@ module.exports = function (mycro) {
             }
         },
         '/role': {
+            policies: [
+                mycro.policies['has_role']('ADMIN')
+            ],
             options: {
                 model: 'role'
             },
@@ -61,9 +82,29 @@ module.exports = function (mycro) {
             options: {
                 model: 'audit'
             },
-            get: 'crud.find'
+            get: {
+                handler: 'crud.find'
+            },
+            '/:id': {
+                options: {
+                    model: 'audit'
+                },
+                get: 'audit.paginateAudit'
+            }
+        },
+        '/rfid': {
+            policies: [
+                mycro.policies['has_role']('ADMIN')
+            ],
+            options: {
+                model: 'audit'
+            },
+            get: 'audit.rfidList'
         },
         '/state': {
+            policies: [
+                mycro.policies['has_role']('ADMIN')
+            ],
             get: 'crud.find',
             put: 'state.create',
             '/:id': {
@@ -83,10 +124,18 @@ module.exports = function (mycro) {
             routes: 'crud'
         } ,
         '/login': {
+            policies: [
+                mycro.services['validation'].hasCredentials()
+            ],
             post: 'user.login'
         } ,
         '/logout': {
-            post: 'user.logout'
+            post: {
+                handler: 'user.logout',
+                policies: [
+                    'is_authenticated'
+                ]
+            }
         }
     };
 };

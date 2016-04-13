@@ -56,7 +56,7 @@ module.exports = function (sequelize, DataTypes) {
                 return [{model: 'state', alias: 'state'}, {model: 'state', alias: 'deviceStates'}]
             },
             order: function (models) {
-                return '`device`.`entity_id` ASC, ' +
+                return '`device`.`entity_id` DESC, ' +
                     '`deviceStates.device_state`.`sort_order` ASC';
             }
         },

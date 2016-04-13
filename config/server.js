@@ -1,7 +1,11 @@
 'use strict';
-var corsMiddleware = require('restify-cors-middleware');
+var corsMiddleware = require('restify-cors-middleware'),
+    fs = require('fs'),
+    yaml = require('js-yaml'),
+    params = yaml.safeLoad(fs.readFileSync('config/parameters.yml', 'utf8'));
+
 module.exports = {
-    port: 8000,
+    port: params['app']['port'],
     middleware: [
         'acceptParser',
         'dateParser',

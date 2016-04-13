@@ -1,16 +1,12 @@
 'use strict';
-var sequelizeAdapter = require('../app/adapters/sequelize');
-
+var sequelizeAdapter = require('../app/adapters/sequelize'),
+    fs = require('fs'),
+    yaml = require('js-yaml'),
+    params = yaml.safeLoad(fs.readFileSync('config/parameters.yml', 'utf8'));
 module.exports = {
     mysql: {
         adapter: sequelizeAdapter,
-        config: {
-            host: process.env.MYSQL_HOST || 'localhost',
-            port: process.env.PORT,
-            user: process.env.MYSQL_USERNAME || 'root',
-            password: process.env.MYSQL_PASSWORD || 'password',
-            database: process.env.MYSQL_DB || 'bnb'
-        },
+        config: params['db'],
         models: [
             // // include the `/app/models/permissions.js` model explicitly
             // 'permissions',

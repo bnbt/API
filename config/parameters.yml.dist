@@ -1,0 +1,13 @@
+app:
+  port: 8000
+db:
+  host: 127.0.0.1
+  post: 3306
+  user:
+  password:
+  database: bnb
+ad:
+  host:
+  username:
+  password:
+  baseDN:

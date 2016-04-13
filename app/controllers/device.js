@@ -115,6 +115,9 @@ module.exports = function (mycro) {
                         accepted: accepted
                     };
                     return models['audit'].create(auditAttributes);
+                })
+                .then(function(data) {
+                    socket.emit('change', {type: 'audit', records: data});
                 });
         },
 

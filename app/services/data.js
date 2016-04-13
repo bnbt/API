@@ -4,6 +4,7 @@ var util = require('util'),
     fs = require('fs');
 module.exports = function (mycro) {
     var models = mycro.models,
+        socket = mycro.services['socket'],
         getIncludes = function (model) {
             var includeArray = [];
             if (model.hasOwnProperty('include')) {
@@ -73,6 +74,7 @@ module.exports = function (mycro) {
         findOnePromise: findOnePromise,
         create: function (model, values, cb) {
             model.create(values).then(function (data) {
+                socket.emit('change', {type: model.inspect(), records: data});
                 return cb(null, data);
             }).catch(function (errors) {
                 return cb(errors, null);
@@ -103,6 +105,7 @@ module.exports = function (mycro) {
         },
         remove: function (model, id, cb) {
             model.destroy({where: {entity_id: id}}).then(function (data) {
+                socket.emit('change', {type: model.inspect(), records: data});
                 return cb(null, data);
             }).catch(function (errors) {
                 return cb(errors, null);
@@ -113,6 +116,7 @@ module.exports = function (mycro) {
             model.findById(id).then(function (data) {
                 return data.updateAttributes(values);
             }).then(function (count, data) {
+                socket.emit('change', {type: model.inspect(), records: data});
                 return cb(null, data);
             }).catch(function (errors) {
                 return cb(errors, null);
@@ -127,6 +131,7 @@ module.exports = function (mycro) {
                 }
                 return setRoles(values, state);
             }).then(function () {
+                socket.emit('change', {type: 'state', records: state});
                 return cb(null, state);
             }).catch(function (errors) {
                 if (state) {
@@ -148,6 +153,7 @@ module.exports = function (mycro) {
                 }
                 return setRoles(values, state);
             }).then(function () {
+                socket.emit('change', {type: 'state', records: state});
                 return cb(null, state);
             }).catch(function (errors) {
                 return cb(errors, null);
@@ -162,6 +168,7 @@ module.exports = function (mycro) {
                 }
                 return setStates(values, device);
             }).then(function () {
+                socket.emit('change', {type: 'device', records: device});
                 return cb(null, device);
             }).catch(function (errors) {
                 if (device) {
@@ -186,11 +193,55 @@ module.exports = function (mycro) {
                     return setStates(values, device);
                 })
                 .then(function () {
+                    socket.emit('change', {type: 'device', records: device});
                     return cb(null, device);
                 })
                 .catch(function (errors) {
                     return cb(errors, null);
                 });
+        },
+        paginateAudit: function (model, id, cb) {
+            model.findAll({
+                include: getIncludes(model),
+                order: getOrder(model),
+                offset: model.getLimit() * (id - 1),
+                limit: model.getLimit()
+            }).then(function (records) {
+                console.log(records.length);
+                return cb(null, records);
+            }).catch(function (errors) {
+                return cb(errors, null);
+            });
+        },
+        rfidList: function(model, cb) {
+            user.
+            model.findAll({
+                attributes: ['rfid'],
+                order: [['entity_id', 'desc']],
+                group: ['rfid']
+            }).then(function (results) {
+                mycro.models.user.findAll()
+                    .then(function (users) {
+                        var returnValues = [];
+                        for (let j = 0; j < results.length; j++) {
+                            var valid = true;
+                            for (let i = 0; i < users.length; i++) {
+                                if (users[i].rfid == results[j].rfid) {
+                                    valid = false;
+                                }
+                            }
+                            if(valid) {
+                                returnValues.push(results[j].rfid);
+                            }
+                        }
+                        cb(null, returnValues);
+                    }).catch(function (error) {
+                        cb(error, null);
+                    });
+
+            }).catch(function (error) {
+                cb(error, null);
+            });
         },
         validateUser: function(req, res) {
             return true;

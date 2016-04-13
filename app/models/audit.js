@@ -51,6 +51,14 @@ module.exports = function (sequelize, DataTypes) {
             },
             include: function() {
                 return ['user', 'device', 'state'];
+            },
+            order: function(model) {
+                return [
+                    ['entity_id', 'DESC']
+                ];
+            },
+            getLimit: function() {
+                return 50;
             }
         },
         timestamps: true,
