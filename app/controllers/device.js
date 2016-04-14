@@ -96,11 +96,20 @@ module.exports = function (mycro) {
                 })
                 .then(function () {
                     socket.emit('change', {type: 'device', records: device});
-                    let response = user ? user.user_AD : 'Unknown user';
-                    res.status(200);
-                    res.end(util.format("~%s~", response));
-                    accepted = true;
-                    Promise.resolve();
+                    if(!user || (user && !user.user_AD)) {
+                        let response = 'Unknown user';
+                        res.status(200);
+                        res.end(util.format("~%s~", response));
+                        accepted = true;
+                        return Promise.resolve();
+                    }
+                    req.mycro.services['activedirectory'].findUser(user.user_AD, function(err, user) {
+                        let response = user.givenName.split(' ')[0].split('-')[0];
+                        res.status(200);
+                        res.end(util.format("~%s~", response));
+                        accepted = true;
+                        return Promise.resolve();
+                    });
                 })
                 .catch(function (error) {
                     return res.json(500, error);

@@ -45,6 +45,60 @@ module.exports = function (mycro) {
                 stripUnknown: true,
                 allowUnknown: false
             })
+        },
+        stateValidation: function() {
+            return mycro.policies.validate('body', function (joi) {
+                return joi.object({
+                    state_name: joi.string().required(),
+                    red: joi.number().integer(),
+                    green: joi.number().integer(),
+                    blue: joi.number().integer(),
+                    is_request: joi.alternatives().try(joi.number().integer(), joi.boolean())
+                }).required();
+            }, {
+                convert: true,
+                stripUnknown: true,
+                allowUnknown: false
+            })
+        },
+        roleValidation: function() {
+            return mycro.policies.validate('body', function (joi) {
+                return joi.object({
+                    role_name: joi.string().required(),
+                    description: joi.string()
+                }).required();
+            }, {
+                convert: true,
+                stripUnknown: true,
+                allowUnknown: false
+            })
+        },
+        userValidation: function() {
+            return mycro.policies.validate('body', function (joi) {
+                return joi.object({
+                    user_AD: joi.string().required(),
+                    role_id: joi.number().integer()
+                }).required();
+            }, {
+                convert: true,
+                stripUnknown: true,
+                allowUnknown: false
+            })
+        },
+        deviceValidation: function() {
+            return mycro.policies.validate('body', function (joi) {
+                return joi.object({
+                    device_id: joi.string().required(),
+                    name: joi.string(),
+                    description: joi.string(),
+                    active: joi.alternatives().try(joi.number().integer(), joi.boolean()),
+                    requires_rfid: joi.alternatives().try(joi.number().integer(), joi.boolean())
+                }).required();
+            }, {
+                convert: true,
+                stripUnknown: true,
+                allowUnknown: false
+            })
         }
     }
 };

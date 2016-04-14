@@ -6,7 +6,8 @@ module.exports = function (mycro) {
             get: 'crud.find',
             put: {
                 policies: [
-                    mycro.policies['has_role']('ADMIN')
+                    mycro.policies['has_role']('ADMIN'),
+                    mycro.services['validation'].deviceValidation()
                 ],
                 handler: 'device.create'
             },
@@ -47,7 +48,8 @@ module.exports = function (mycro) {
                 get: 'crud.findOne',
                 post: {
                     additionalPolicies: [
-                        mycro.policies['has_role'](ADMIN)
+                        mycro.policies['has_role'](ADMIN),
+                        mycro.services['validation'].deviceValidation()
                     ],
                     handler: 'device.update'
                 },
@@ -60,11 +62,22 @@ module.exports = function (mycro) {
             policies: [
                 mycro.policies['has_role'](ADMIN)
             ],
+            put: {
+                handler: 'crud.create',
+                additionalPolicies: [
+                    mycro.services['validation'].userValidation()
+                ]
+            },
+            post: {
+                handler: 'crud.update',
+                additionalPolicies: [
+                    mycro.services['validation'].userValidation()
+                ]
+            },
             options: {
                 model: 'user'
             },
             routes: 'crud',
-
             '/ad': {
                 get: 'user.getADUsers'
             }
@@ -73,6 +86,18 @@ module.exports = function (mycro) {
             policies: [
                 mycro.policies['has_role'](ADMIN)
             ],
+            put: {
+                handler: 'crud.create',
+                additionalPolicies: [
+                    mycro.services['validation'].roleValidation()
+                ]
+            },
+            post: {
+                handler: 'crud.update',
+                additionalPolicies: [
+                    mycro.services['validation'].roleValidation()
+                ]
+            },
             options: {
                 model: 'role'
             },
@@ -106,14 +131,24 @@ module.exports = function (mycro) {
                 mycro.policies['has_role'](ADMIN)
             ],
             get: 'crud.find',
-            put: 'state.create',
+            put: {
+                handler: 'state.create',
+                additionalPolicies: [
+                    mycro.services['validation'].stateValidation()
+                ]
+            },
             '/:id': {
                 policies: [
                     mycro.services['validation'].entityId()
                 ],
                 del: 'crud.destroy',
                 get: 'crud.findOne',
-                post: 'state.update',
+                post: {
+                    handler: 'state.update',
+                    additionalPolicies: [
+                        mycro.services['validation'].stateValidation()
+                    ]
+                },
                 options: {
                     model: 'state'
                 }

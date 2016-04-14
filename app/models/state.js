@@ -10,6 +10,10 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNull: true
         },
+        is_request: {
+            type: DataTypes.BOOLEAN,
+            allowNull: true
+        },
         red: {
             type: DataTypes.INTEGER(3),
             allowNull: true

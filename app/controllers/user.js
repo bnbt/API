@@ -39,10 +39,7 @@ module.exports = function (mycro) {
             var username = req.body.username,
                 password = req.body.password;
             userService.authenticate(username, password, function (err, auth) {
-                if (err) {
-                    return res.json(500, {error: "Error logging in"});
-                }
-                if (!auth) {
+                if (!auth || err) {
                     return res.json(403, {error: "Incorrect credentials"});
                 }
                 // authentication successful
@@ -66,7 +63,7 @@ module.exports = function (mycro) {
                             user = data;
                         }
                         let role = user ? user.role ? user.role.name : null : null;
-                        res.json(200, {token: token, role: role });
+                        res.json(200, {token: token, role: role, name: auth.displayName });
                     })
                     .catch(function (err) {
                         res.json(401, err);
