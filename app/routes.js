@@ -62,6 +62,9 @@ module.exports = function (mycro) {
             policies: [
                 mycro.policies['has_role'](ADMIN)
             ],
+			'/ad': {
+                get: 'user.getADUsers'
+            },
             put: {
                 handler: 'crud.create',
                 additionalPolicies: [
@@ -78,9 +81,6 @@ module.exports = function (mycro) {
                 model: 'user'
             },
             routes: 'crud',
-            '/ad': {
-                get: 'user.getADUsers'
-            }
         },
         '/role': {
             policies: [

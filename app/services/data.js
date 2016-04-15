@@ -74,52 +74,51 @@ module.exports = function (mycro) {
         findOnePromise: findOnePromise,
         create: function (model, values, cb) {
             model.create(values).then(function (data) {
-                socket.emit('change', {type: model.inspect(), records: data});
-                return cb(null, data);
+                cb(null, data);
             }).catch(function (errors) {
-                return cb(errors, null);
+                cb(errors, null);
             });
         },
 
         detail: function (model, id, cb) {
             model.findOne({where: {entity_id: id}, include: getIncludes(model)}).then(function (data) {
-                return cb(null, data);
+                cb(null, data);
             }).catch(function (errors) {
-                return cb(errors, null);
+                cb(errors, null);
             });
         },
 
         find: function (model, criteria, cb) {
             findPromise(model, criteria).then(function (data) {
-                return cb(null, data);
+                cb(null, data);
             }).catch(function (errors) {
-                return cb(errors, null);
+                cb(errors, null);
             });
         },
         findOne: function (model, criteria, cb) {
             findOnePromise(model, criteria).then(function (data) {
-                return cb(null, data);
+                cb(null, data);
             }).catch(function (errors) {
-                return cb(errors, null);
+                cb(errors, null);
             });
         },
         remove: function (model, id, cb) {
-            model.destroy({where: {entity_id: id}}).then(function (data) {
-                socket.emit('change', {type: model.inspect(), records: data});
-                return cb(null, data);
+            model.destroy({where: {entity_id: id}}).then(function () {
+                cb(null, {entity_id: id});
             }).catch(function (errors) {
-                return cb(errors, null);
+                cb(errors, null);
             });
         },
 
         update: function (model, id, values, cb) {
+            var instance = null;
             model.findById(id).then(function (data) {
+                instance = data;
                 return data.updateAttributes(values);
-            }).then(function (count, data) {
-                socket.emit('change', {type: model.inspect(), records: data});
-                return cb(null, data);
+            }).then(function () {
+                cb(null, instance);
             }).catch(function (errors) {
-                return cb(errors, null);
+                cb(errors, null);
             });
         },
         createState: function (model, values, cb) {
@@ -131,8 +130,7 @@ module.exports = function (mycro) {
                 }
                 return setRoles(values, state);
             }).then(function () {
-                socket.emit('change', {type: 'state', records: state});
-                return cb(null, state);
+                cb(null, state);
             }).catch(function (errors) {
                 if (state) {
                     state.destroy().then(function () {
@@ -153,10 +151,9 @@ module.exports = function (mycro) {
                 }
                 return setRoles(values, state);
             }).then(function () {
-                socket.emit('change', {type: 'state', records: state});
-                return cb(null, state);
+                cb(null, state);
             }).catch(function (errors) {
-                return cb(errors, null);
+                cb(errors, null);
             });
         },
         createDevice: function (model, values, cb) {
@@ -168,8 +165,7 @@ module.exports = function (mycro) {
                 }
                 return setStates(values, device);
             }).then(function () {
-                socket.emit('change', {type: 'device', records: device});
-                return cb(null, device);
+                cb(null, device);
             }).catch(function (errors) {
                 if (device) {
                     return device.destroy().then(function () {
@@ -193,11 +189,10 @@ module.exports = function (mycro) {
                     return setStates(values, device);
                 })
                 .then(function () {
-                    socket.emit('change', {type: 'device', records: device});
-                    return cb(null, device);
+                    cb(null, device);
                 })
                 .catch(function (errors) {
-                    return cb(errors, null);
+                    cb(errors, null);
                 });
         },
         paginateAudit: function (model, id, cb) {
@@ -242,9 +237,6 @@ module.exports = function (mycro) {
             }).catch(function (error) {
                 cb(error, null);
             });
-        },
-        validateUser: function(req, res) {
-            return true;
         }
     };
 };

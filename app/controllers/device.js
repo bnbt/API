@@ -162,8 +162,8 @@ module.exports = function (mycro) {
                 if (err) {
                     return res.json(500, {error: err});
                 }
-                res.json(200, records);
                 socket.emit('change', {type: req.options.model, records: records});
+                res.json(200, records);
             });
         },
 
@@ -173,8 +173,8 @@ module.exports = function (mycro) {
                 if (err) {
                     return res.json(500, {error: err});
                 }
-                res.json(200, records);
                 socket.emit('change', {type: req.options.model, records: records});
+                res.json(200, records);
             });
         }
     }

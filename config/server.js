@@ -15,7 +15,8 @@ module.exports = {
             var cors = corsMiddleware({
                 preflightMaxAge: 5,
                 origins: ['*'],
-                credentials: true // defaults to false
+                credentials: true, // defaults to false
+                allowHeaders: ['x-token']
             });
             mycro.server.pre(cors.preflight);
             return cors.actual;
