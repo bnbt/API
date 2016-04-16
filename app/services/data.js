@@ -53,12 +53,17 @@ module.exports = function (mycro) {
                     return state.setStateRoles(data)
                 })
         },
-        findPromise = function (model, criteria) {
-            return model.findAll({
+        findPromise = function (model, criteria, limit, offset) {
+            let query = {
                 where: criteria,
                 include: getIncludes(model),
                 order: getOrder(model)
-            })
+            };
+            if (limit)
+                query.limit = limit;
+            if (offset)
+                query.offset = offset;
+            return model.findAll(query);
         },
         findOnePromise = function (model, criteria) {
             return model.find({
@@ -88,8 +93,8 @@ module.exports = function (mycro) {
             });
         },
 
-        find: function (model, criteria, cb) {
-            findPromise(model, criteria).then(function (data) {
+        find: function (model, criteria, cb, limit, offset) {
+            findPromise(model, criteria, limit, offset).then(function (data) {
                 cb(null, data);
             }).catch(function (errors) {
                 cb(errors, null);
@@ -165,7 +170,9 @@ module.exports = function (mycro) {
                 }
                 return setStates(values, device);
             }).then(function () {
-                cb(null, device);
+                return findOnePromise(model, {entity_id: device.entity_id});
+            }).then(function (data) {
+                cb(null, data);
             }).catch(function (errors) {
                 if (device) {
                     return device.destroy().then(function () {
@@ -189,7 +196,10 @@ module.exports = function (mycro) {
                     return setStates(values, device);
                 })
                 .then(function () {
-                    cb(null, device);
+                    return findOnePromise(model, {entity_id: id});
+                })
+                .then(function (data) {
+                    cb(null, data);
                 })
                 .catch(function (errors) {
                     cb(errors, null);
@@ -208,35 +218,35 @@ module.exports = function (mycro) {
                 return cb(errors, null);
             });
         },
-        rfidList: function(model, cb) {
+        rfidList: function (model, cb) {
             user.
-            model.findAll({
-                attributes: ['rfid'],
-                order: [['entity_id', 'desc']],
-                group: ['rfid']
-            }).then(function (results) {
-                mycro.models.user.findAll()
-                    .then(function (users) {
-                        var returnValues = [];
-                        for (let j = 0; j < results.length; j++) {
-                            var valid = true;
-                            for (let i = 0; i < users.length; i++) {
-                                if (users[i].rfid == results[j].rfid) {
-                                    valid = false;
+                model.findAll({
+                    attributes: ['rfid'],
+                    order: [['entity_id', 'desc']],
+                    group: ['rfid']
+                }).then(function (results) {
+                    mycro.models.user.findAll()
+                        .then(function (users) {
+                            var returnValues = [];
+                            for (let j = 0; j < results.length; j++) {
+                                var valid = true;
+                                for (let i = 0; i < users.length; i++) {
+                                    if (users[i].rfid == results[j].rfid) {
+                                        valid = false;
+                                    }
+                                }
+                                if (valid) {
+                                    returnValues.push(results[j].rfid);
                                 }
                             }
-                            if(valid) {
-                                returnValues.push(results[j].rfid);
-                            }
-                        }
-                        cb(null, returnValues);
-                    }).catch(function (error) {
-                        cb(error, null);
-                    });
+                            cb(null, returnValues);
+                        }).catch(function (error) {
+                            cb(error, null);
+                        });
 
-            }).catch(function (error) {
-                cb(error, null);
-            });
+                }).catch(function (error) {
+                    cb(error, null);
+                });
         }
     };
 };

@@ -1,6 +1,11 @@
 module.exports = function(mycro) {
     return {
-        get: 'crud.find',
+        get: {
+            additionalPolicies: [
+                mycro.services['validation'].paginationValidation()
+            ],
+            handler: 'crud.find'
+        },
         put: 'crud.create',
         '/:id': {
             policies: [

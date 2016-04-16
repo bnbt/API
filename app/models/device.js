@@ -24,7 +24,11 @@ module.exports = function (sequelize, DataTypes) {
         },
         last_request_user: {
             type: DataTypes.INTEGER(11),
-            allowNull: true
+            allowNull: true,
+            references: {
+                model: 'user',
+                key: 'entity_id'
+            }
         },
         last_request_date: {
             type: DataTypes.DATE,
@@ -41,6 +45,10 @@ module.exports = function (sequelize, DataTypes) {
         requires_rfid: {
             type: DataTypes.INTEGER(4),
             allowNull: true
+        },
+        last_heartbeat: {
+            type: DataTypes.DATE,
+            allowNull: true
         }
     }, {
         classMethods: {
@@ -51,9 +59,14 @@ module.exports = function (sequelize, DataTypes) {
                     as: {singular: 'deviceState', plural: 'deviceStates'}
                 });
                 device.belongsTo(models.state, {foreignKey: 'current_state'});
+                device.belongsTo(models.user, {as: 'lastUser', foreignKey: 'last_request_user'});
             },
             include: function () {
-                return [{model: 'state', alias: 'state'}, {model: 'state', alias: 'deviceStates'}]
+                return [
+                    {model: 'state', alias: 'state'},
+                    {model: 'state', alias: 'deviceStates'},
+                    {model: 'user', alias: 'lastUser'}
+                ]
             },
             order: function (models) {
                 return '`device`.`entity_id` DESC, ' +

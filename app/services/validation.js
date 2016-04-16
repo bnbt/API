@@ -57,8 +57,8 @@ module.exports = function (mycro) {
                 }).required();
             }, {
                 convert: true,
-                stripUnknown: true,
-                allowUnknown: false
+                stripUnknown: false,
+                allowUnknown: true
             })
         },
         roleValidation: function() {
@@ -69,8 +69,8 @@ module.exports = function (mycro) {
                 }).required();
             }, {
                 convert: true,
-                stripUnknown: true,
-                allowUnknown: false
+                stripUnknown: false,
+                allowUnknown: true
             })
         },
         userValidation: function() {
@@ -81,8 +81,8 @@ module.exports = function (mycro) {
                 }).required();
             }, {
                 convert: true,
-                stripUnknown: true,
-                allowUnknown: false
+                stripUnknown: false,
+                allowUnknown: true
             })
         },
         deviceValidation: function() {
@@ -90,14 +90,25 @@ module.exports = function (mycro) {
                 return joi.object({
                     device_id: joi.string().required(),
                     name: joi.string(),
-                    description: joi.string(),
                     active: joi.alternatives().try(joi.number().integer(), joi.boolean()),
                     requires_rfid: joi.alternatives().try(joi.number().integer(), joi.boolean())
                 }).required();
             }, {
                 convert: true,
-                stripUnknown: true,
-                allowUnknown: false
+                stripUnknown: false,
+                allowUnknown: true
+            })
+        },
+        paginationValidation: function() {
+            return mycro.policies.validate('query', function (joi) {
+                return joi.object({
+                    p: joi.number().integer().min(0).default(0),
+                    l: joi.number().integer().min(0).default(30)
+                }).required();
+            }, {
+                convert: true,
+                stripUnknown: false,
+                allowUnknown: true
             })
         }
     }

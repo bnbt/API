@@ -18,7 +18,8 @@
     "mysql": "^2.10.2",
     "restify-cors-middleware": "0.0.6",
     "sequelize": "^3.20.0",
-    "socket.io": "^1.4.5"
+    "socket.io": "^1.4.5",
+    "jake": "latest"
   },
   "devDependencies": {
     "chai": "^3.4.1",

@@ -3,7 +3,9 @@ const ADMIN = 'ADMIN';
 module.exports = function (mycro) {
     return {
         '/device': {
-            get: 'crud.find',
+            get: {
+                handler: 'crud.find'
+            },
             put: {
                 policies: [
                     mycro.policies['has_role']('ADMIN'),
@@ -58,13 +60,16 @@ module.exports = function (mycro) {
                 }
             }
         },
+        '/user/ad': {
+            policies: [
+                'is_authenticated'
+            ],
+            get: 'user.getADUsers'
+        },
         '/user': {
             policies: [
                 mycro.policies['has_role'](ADMIN)
             ],
-			'/ad': {
-                get: 'user.getADUsers'
-            },
             put: {
                 handler: 'crud.create',
                 additionalPolicies: [
@@ -80,21 +85,20 @@ module.exports = function (mycro) {
             options: {
                 model: 'user'
             },
-            routes: 'crud',
+            routes: 'crud'
         },
         '/role': {
-            policies: [
-                mycro.policies['has_role'](ADMIN)
-            ],
             put: {
                 handler: 'crud.create',
                 additionalPolicies: [
+                    mycro.policies['has_role'](ADMIN),
                     mycro.services['validation'].roleValidation()
                 ]
             },
             post: {
                 handler: 'crud.update',
                 additionalPolicies: [
+                    mycro.policies['has_role'](ADMIN),
                     mycro.services['validation'].roleValidation()
                 ]
             },
@@ -108,13 +112,10 @@ module.exports = function (mycro) {
                 model: 'audit'
             },
             get: {
+                additionalPolicies: [
+                    mycro.services['validation'].paginationValidation()
+                ],
                 handler: 'crud.find'
-            },
-            '/:id': {
-                options: {
-                    model: 'audit'
-                },
-                get: 'audit.paginateAudit'
             }
         },
         '/rfid': {
@@ -127,18 +128,22 @@ module.exports = function (mycro) {
             get: 'audit.rfidList'
         },
         '/state': {
-            policies: [
-                mycro.policies['has_role'](ADMIN)
-            ],
-            get: 'crud.find',
+            get: {
+                additionalPolicies: [
+                    mycro.services['validation'].paginationValidation()
+                ],
+                handler: 'crud.find'
+            },
             put: {
                 handler: 'state.create',
                 additionalPolicies: [
+                    mycro.policies['has_role'](ADMIN),
                     mycro.services['validation'].stateValidation()
                 ]
             },
             '/:id': {
                 policies: [
+                    mycro.policies['has_role'](ADMIN),
                     mycro.services['validation'].entityId()
                 ],
                 del: 'crud.destroy',

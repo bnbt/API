@@ -13,7 +13,7 @@ module.exports = function (mycro) {
                 if (err) {
                     return res.json(500, {error: err});
                 }
-                socket.emit('change', {type: req.options.model, records: records});
+                socket.emit('change', {type: req.options.model, action: 'create', records: records});
                 res.json(200, records);
             });
         },
@@ -23,18 +23,18 @@ module.exports = function (mycro) {
                 if (err) {
                     return res.json(500, {error: err});
                 }
-                socket.emit('change', {type: req.options.model, records: records});
+                socket.emit('change', {type: req.options.model, action: 'delete', records: records});
                 res.json(200, records);
             });
         },
         find: function (req, res) {
             var model = populateModelFromRequest(req, res);
-            req.mycro.services['data'].find(model, req.query, function(err, records) {
+            req.mycro.services['data'].find(model, {}, function(err, records) {
                 if (err) {
                     return res.json(500, {error: err});
                 }
                 res.json(200, records);
-            });
+            }, req.query.l * 1, req.query.p * req.query.l);
         },
         findOne: function (req, res) {
             var model = populateModelFromRequest(req, res);
@@ -51,7 +51,7 @@ module.exports = function (mycro) {
                 if (err) {
                     return res.json(500, {error: err});
                 }
-                socket.emit('change', {type: req.options.model, records: records});
+                socket.emit('change', {type: req.options.model, action: 'update', records: records});
                 res.json(200, records);
             });
         }

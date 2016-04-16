@@ -17,7 +17,7 @@ module.exports = function (mycro) {
                 if (err) {
                     return res.json(500, {error: err});
                 }
-                socket.emit('change', {type: 'state', records: records});
+                socket.emit('change', {type: 'state', action: 'create', records: records});
                 res.json(200, records);
             });
         },
@@ -28,7 +28,7 @@ module.exports = function (mycro) {
                 if (err) {
                     return res.json(500, {error: err});
                 }
-                socket.emit('change', {type: 'state', records: records});
+                socket.emit('change', {type: 'state', action: 'update', records: records});
                 res.json(200, records);
             });
         }

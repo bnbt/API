@@ -8,15 +8,6 @@ module.exports = function (mycro) {
         return Model
     };
     return {
-        paginateAudit: function (req, res) {
-            var model = populateModelFromRequest(req, res);
-            req.mycro.services['data'].paginateAudit(model, req.params.id, function(err, records) {
-                if (err) {
-                    return res.json(500, {error: err});
-                }
-                res.json(200, records);
-            });
-        },
         rfidList: function(req, res) {
             var model = populateModelFromRequest(req, res);
             req.mycro.services['data'].rfidList(model, function(err, records) {

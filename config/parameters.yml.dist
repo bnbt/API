@@ -11,3 +11,4 @@ ad:
   username:
   password:
   baseDN:
+max_heartbeat: 5 #minutes

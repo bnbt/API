@@ -32,7 +32,10 @@ module.exports = function (mycro) {
                         }
                         stateColors[index] = [state.state_name, state.red, state.green, state.blue].join(',');
                     });
-                    return res.end(util.format("~%d,%d,%s~", currentState, stateColors.length, stateColors.join(',')))
+                    res.end(util.format("~%d,%d,%s~", currentState, stateColors.length, stateColors.join(',')));
+                    device.set('last_heartbeat', new Date());
+                    device.set('active', true);
+                    device.save();
                 }
             );
         },
@@ -92,10 +95,15 @@ module.exports = function (mycro) {
                 })
                 .then(function () {
                     device.set('current_state', deviceState.entity_id);
+                    device.set('last_request_date', new Date());
+                    device.set('last_heartbeat', new Date());
+                    if(user) {
+                        device.set('last_request_user', user.entity_id)
+                    }
                     return device.save();
                 })
                 .then(function () {
-                    socket.emit('change', {type: 'device', records: device});
+                    socket.emit('change', {type: 'device', action: 'update', records: device});
                     if(!user || (user && !user.user_AD)) {
                         let response = 'Unknown user';
                         res.status(200);
@@ -103,10 +111,10 @@ module.exports = function (mycro) {
                         accepted = true;
                         return Promise.resolve();
                     }
-                    req.mycro.services['activedirectory'].findUser(user.user_AD, function(err, user) {
-                        let response = user.givenName.split(' ')[0].split('-')[0];
+                    req.mycro.services['activedirectory'].findUser(user.user_AD, function(err, adUser) {
+                        let response = !err && adUser ? mycro.services['helper'].removeDiacritics(adUser.givenName.split(' ')[0].split('-')[0]) : "Unknown user";
                         res.status(200);
-                        res.end(util.format("~%s~", response));
+                        res.end(util.format("~%s~", response.substring(0, 16)));
                         accepted = true;
                         return Promise.resolve();
                     });
@@ -119,14 +127,14 @@ module.exports = function (mycro) {
                         request_date: new Date(),
                         device_id: device.entity_id,
                         state_id: deviceState.entity_id,
+                        user_id: user ? user.entity_id : null,
                         rfid: rfidCode,
-                        user: user || null,
                         accepted: accepted
                     };
                     return models['audit'].create(auditAttributes);
                 })
                 .then(function(data) {
-                    socket.emit('change', {type: 'audit', records: data});
+                    socket.emit('change', {type: 'audit', action: 'create', records: data});
                 });
         },
 
@@ -152,6 +160,9 @@ module.exports = function (mycro) {
                             return res.end(util.format("~%d~", state.device_state.sort_order))
                         }
                     });
+                    device.set('last_heartbeat', new Date());
+                    device.set('active', true);
+                    device.save();
                 }
             );
         },
@@ -162,7 +173,7 @@ module.exports = function (mycro) {
                 if (err) {
                     return res.json(500, {error: err});
                 }
-                socket.emit('change', {type: req.options.model, records: records});
+                socket.emit('change', {type: req.options.model, action: 'create', records: records});
                 res.json(200, records);
             });
         },
@@ -173,7 +184,7 @@ module.exports = function (mycro) {
                 if (err) {
                     return res.json(500, {error: err});
                 }
-                socket.emit('change', {type: req.options.model, records: records});
+                socket.emit('change', {type: req.options.model, action: 'update', records: records});
                 res.json(200, records);
             });
         }
