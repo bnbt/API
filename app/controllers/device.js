@@ -97,6 +97,7 @@ module.exports = function (mycro) {
                     device.set('current_state', deviceState.entity_id);
                     device.set('last_request_date', new Date());
                     device.set('last_heartbeat', new Date());
+                    device.set('active', true);
                     if(user) {
                         device.set('last_request_user', user.entity_id)
                     }
